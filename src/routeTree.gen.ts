@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as PricingRouteImport } from './routes/pricing'
 import { Route as IndustriesRouteImport } from './routes/industries'
 import { Route as EnvironmentsRouteImport } from './routes/environments'
 import { Route as DocsRouteImport } from './routes/docs'
@@ -17,6 +18,11 @@ import { Route as AnalyticsRouteImport } from './routes/analytics'
 import { Route as AiToolsRouteImport } from './routes/ai-tools'
 import { Route as IndexRouteImport } from './routes/index'
 
+const PricingRoute = PricingRouteImport.update({
+  id: '/pricing',
+  path: '/pricing',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndustriesRoute = IndustriesRouteImport.update({
   id: '/industries',
   path: '/industries',
@@ -61,6 +67,7 @@ export interface FileRoutesByFullPath {
   '/docs': typeof DocsRoute
   '/environments': typeof EnvironmentsRoute
   '/industries': typeof IndustriesRoute
+  '/pricing': typeof PricingRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -70,6 +77,7 @@ export interface FileRoutesByTo {
   '/docs': typeof DocsRoute
   '/environments': typeof EnvironmentsRoute
   '/industries': typeof IndustriesRoute
+  '/pricing': typeof PricingRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -80,6 +88,7 @@ export interface FileRoutesById {
   '/docs': typeof DocsRoute
   '/environments': typeof EnvironmentsRoute
   '/industries': typeof IndustriesRoute
+  '/pricing': typeof PricingRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -91,6 +100,7 @@ export interface FileRouteTypes {
     | '/docs'
     | '/environments'
     | '/industries'
+    | '/pricing'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -100,6 +110,7 @@ export interface FileRouteTypes {
     | '/docs'
     | '/environments'
     | '/industries'
+    | '/pricing'
   id:
     | '__root__'
     | '/'
@@ -109,6 +120,7 @@ export interface FileRouteTypes {
     | '/docs'
     | '/environments'
     | '/industries'
+    | '/pricing'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -119,10 +131,18 @@ export interface RootRouteChildren {
   DocsRoute: typeof DocsRoute
   EnvironmentsRoute: typeof EnvironmentsRoute
   IndustriesRoute: typeof IndustriesRoute
+  PricingRoute: typeof PricingRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/pricing': {
+      id: '/pricing'
+      path: '/pricing'
+      fullPath: '/pricing'
+      preLoaderRoute: typeof PricingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/industries': {
       id: '/industries'
       path: '/industries'
@@ -183,6 +203,7 @@ const rootRouteChildren: RootRouteChildren = {
   DocsRoute: DocsRoute,
   EnvironmentsRoute: EnvironmentsRoute,
   IndustriesRoute: IndustriesRoute,
+  PricingRoute: PricingRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

@@ -39,6 +39,14 @@ function AnalyticsPage() {
     { label: "System load", value: `${Math.round(cpu)}%`, icon: Cpu, trend: "+0.4%", up: true },
   ];
 
+  const statuses = [
+    { name: "Reconstruction service", status: "Operational", dot: "bg-emerald-500" },
+    { name: "Telemetry stream", status: "Operational", dot: "bg-emerald-500" },
+    { name: "Render pipeline", status: "Degraded", dot: "bg-amber-500" },
+    { name: "API gateway", status: "Operational", dot: "bg-emerald-500" },
+    { name: "Multiplayer sync", status: "Operational", dot: "bg-emerald-500" },
+  ];
+
   return (
     <PageShell
       eyebrow="Analytics"
@@ -74,17 +82,11 @@ function AnalyticsPage() {
         <div className="rounded-2xl glass p-5">
           <p className="text-xs uppercase tracking-widest text-muted-foreground">System status</p>
           <ul className="mt-4 space-y-3 text-sm">
-            {[
-              { name: "Reconstruction service", status: "Operational", color: "emerald" },
-              { name: "Telemetry stream", status: "Operational", color: "emerald" },
-              { name: "Render pipeline", status: "Degraded", color: "amber" },
-              { name: "API gateway", status: "Operational", color: "emerald" },
-              { name: "Multiplayer sync", status: "Operational", color: "emerald" },
-            ].map((s) => (
+            {statuses.map((s) => (
               <li key={s.name} className="flex items-center justify-between">
                 <span className="text-foreground/85">{s.name}</span>
                 <span className="inline-flex items-center gap-1.5 text-xs text-muted-foreground">
-                  <span className={`h-1.5 w-1.5 rounded-full bg-${s.color}-500 animate-pulse-glow`} />
+                  <span className={`h-1.5 w-1.5 rounded-full ${s.dot} animate-pulse-glow`} />
                   {s.status}
                 </span>
               </li>

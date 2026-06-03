@@ -9,9 +9,15 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as IndustriesRouteImport } from './routes/industries'
 import { Route as EnvironmentsRouteImport } from './routes/environments'
 import { Route as IndexRouteImport } from './routes/index'
 
+const IndustriesRoute = IndustriesRouteImport.update({
+  id: '/industries',
+  path: '/industries',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const EnvironmentsRoute = EnvironmentsRouteImport.update({
   id: '/environments',
   path: '/environments',
@@ -26,31 +32,42 @@ const IndexRoute = IndexRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/environments': typeof EnvironmentsRoute
+  '/industries': typeof IndustriesRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/environments': typeof EnvironmentsRoute
+  '/industries': typeof IndustriesRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/environments': typeof EnvironmentsRoute
+  '/industries': typeof IndustriesRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/environments'
+  fullPaths: '/' | '/environments' | '/industries'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/environments'
-  id: '__root__' | '/' | '/environments'
+  to: '/' | '/environments' | '/industries'
+  id: '__root__' | '/' | '/environments' | '/industries'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   EnvironmentsRoute: typeof EnvironmentsRoute
+  IndustriesRoute: typeof IndustriesRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/industries': {
+      id: '/industries'
+      path: '/industries'
+      fullPath: '/industries'
+      preLoaderRoute: typeof IndustriesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/environments': {
       id: '/environments'
       path: '/environments'
@@ -71,6 +88,7 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   EnvironmentsRoute: EnvironmentsRoute,
+  IndustriesRoute: IndustriesRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

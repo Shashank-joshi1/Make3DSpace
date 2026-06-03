@@ -25,7 +25,7 @@ export function FeatureGrid() {
             className="group bg-background p-7 hover:bg-surface transition-colors"
           >
             <div className="h-10 w-10 rounded-xl grid place-items-center bg-gradient-to-br from-primary/20 to-accent-glow/20 border border-border/80 text-foreground group-hover:from-primary/30 group-hover:to-accent-glow/30 transition-colors">
-              <it.icon className="h-4.5 w-4.5" />
+              <it.icon className="h-4 w-4" />
             </div>
             <h3 className="mt-5 text-base font-semibold tracking-tight">{it.title}</h3>
             <p className="mt-2 text-sm text-muted-foreground leading-relaxed">{it.body}</p>

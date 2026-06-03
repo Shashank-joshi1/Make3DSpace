@@ -13,6 +13,7 @@ import { Route as IndustriesRouteImport } from './routes/industries'
 import { Route as EnvironmentsRouteImport } from './routes/environments'
 import { Route as BuilderRouteImport } from './routes/builder'
 import { Route as AnalyticsRouteImport } from './routes/analytics'
+import { Route as AiToolsRouteImport } from './routes/ai-tools'
 import { Route as IndexRouteImport } from './routes/index'
 
 const IndustriesRoute = IndustriesRouteImport.update({
@@ -35,6 +36,11 @@ const AnalyticsRoute = AnalyticsRouteImport.update({
   path: '/analytics',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AiToolsRoute = AiToolsRouteImport.update({
+  id: '/ai-tools',
+  path: '/ai-tools',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
@@ -43,6 +49,7 @@ const IndexRoute = IndexRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/ai-tools': typeof AiToolsRoute
   '/analytics': typeof AnalyticsRoute
   '/builder': typeof BuilderRoute
   '/environments': typeof EnvironmentsRoute
@@ -50,6 +57,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/ai-tools': typeof AiToolsRoute
   '/analytics': typeof AnalyticsRoute
   '/builder': typeof BuilderRoute
   '/environments': typeof EnvironmentsRoute
@@ -58,6 +66,7 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/ai-tools': typeof AiToolsRoute
   '/analytics': typeof AnalyticsRoute
   '/builder': typeof BuilderRoute
   '/environments': typeof EnvironmentsRoute
@@ -65,12 +74,25 @@ export interface FileRoutesById {
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/analytics' | '/builder' | '/environments' | '/industries'
+  fullPaths:
+    | '/'
+    | '/ai-tools'
+    | '/analytics'
+    | '/builder'
+    | '/environments'
+    | '/industries'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/analytics' | '/builder' | '/environments' | '/industries'
+  to:
+    | '/'
+    | '/ai-tools'
+    | '/analytics'
+    | '/builder'
+    | '/environments'
+    | '/industries'
   id:
     | '__root__'
     | '/'
+    | '/ai-tools'
     | '/analytics'
     | '/builder'
     | '/environments'
@@ -79,6 +101,7 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AiToolsRoute: typeof AiToolsRoute
   AnalyticsRoute: typeof AnalyticsRoute
   BuilderRoute: typeof BuilderRoute
   EnvironmentsRoute: typeof EnvironmentsRoute
@@ -115,6 +138,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AnalyticsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/ai-tools': {
+      id: '/ai-tools'
+      path: '/ai-tools'
+      fullPath: '/ai-tools'
+      preLoaderRoute: typeof AiToolsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -127,6 +157,7 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AiToolsRoute: AiToolsRoute,
   AnalyticsRoute: AnalyticsRoute,
   BuilderRoute: BuilderRoute,
   EnvironmentsRoute: EnvironmentsRoute,

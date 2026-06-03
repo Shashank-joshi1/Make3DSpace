@@ -1,29 +1,27 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { Hero } from "@/components/hero";
+import { FeatureGrid, LiveAnalyticsBlock, IndustriesStrip, CTABlock } from "@/components/home-sections";
 
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Your App" },
-      { name: "description", content: "Replace this with a one-sentence description of your app." },
-      { property: "og:title", content: "Your App" },
-      { property: "og:description", content: "Replace this with a one-sentence description of your app." },
+      { title: "Make3DSpace — Turn Any Space Into Interactive 3D" },
+      { name: "description", content: "AI-powered digital twin platform for campuses, malls, hospitals, smart buildings, and interiors. Build, simulate, and operate real-world environments in 3D." },
+      { property: "og:title", content: "Make3DSpace — Turn Any Space Into Interactive 3D" },
+      { property: "og:description", content: "AI-powered digital twin platform for real-world environments." },
     ],
   }),
   component: Index,
 });
 
-// IMPORTANT: Replace this placeholder. See ./README.md for routing conventions.
 function Index() {
   return (
-    <div
-      className="flex min-h-screen items-center justify-center"
-      style={{ backgroundColor: "#fcfbf8" }}
-    >
-      <img
-        data-lovable-blank-page-placeholder="REMOVE_THIS"
-        src="https://cdn.gpteng.co/blank-app-v1.svg"
-        alt="Your app will live here!"
-      />
-    </div>
+    <>
+      <Hero />
+      <FeatureGrid />
+      <LiveAnalyticsBlock />
+      <IndustriesStrip />
+      <CTABlock />
+    </>
   );
 }

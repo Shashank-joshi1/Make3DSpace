@@ -1,8 +1,6 @@
 import oceanAsset from "./ocean.mp4.asset.json";
-import desktopAsset from "./desktop-scene.png.asset.json";
 
 export const oceanVideo = oceanAsset.url;
-export const desktopScene = desktopAsset.url;
 
 export { default as monitorOnly } from "./monitor-only.png";
 export { default as demoPoster } from "./demo-poster.jpg";

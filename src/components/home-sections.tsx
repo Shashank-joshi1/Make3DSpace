@@ -1,6 +1,6 @@
 import { motion } from "framer-motion";
 import { Link } from "@tanstack/react-router";
-import { Activity, Boxes, Building2, Cpu, Layers, LineChart, Radio, ScanLine, ShieldCheck, Sparkles, ArrowRight, ArrowUpRight, MessageSquare, Box, BookOpen } from "lucide-react";
+import { Activity, Boxes, Building2, Cpu, Layers, LineChart, Radio, ScanLine, ShieldCheck, Sparkles, Zap, ArrowRight, ArrowUpRight, MessageSquare, Box, BookOpen } from "lucide-react";
 import { useRef, useState, useEffect } from "react";
 
 export function FeatureGrid() {

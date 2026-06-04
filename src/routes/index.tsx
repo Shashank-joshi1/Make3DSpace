@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { Hero } from "@/components/hero";
 import { FeatureGrid, LiveAnalyticsBlock, IndustriesStrip, CTABlock } from "@/components/home-sections";
+import { EnvironmentsMarquee } from "@/components/environments-marquee";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -18,6 +19,7 @@ function Index() {
   return (
     <>
       <Hero />
+      <EnvironmentsMarquee />
       <FeatureGrid />
       <LiveAnalyticsBlock />
       <IndustriesStrip />

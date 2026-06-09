@@ -2,6 +2,7 @@ import { motion } from "framer-motion";
 import { Link } from "@tanstack/react-router";
 import { Activity, Boxes, Building2, Cpu, Layers, LineChart, Radio, ScanLine, ShieldCheck, Sparkles, Zap, ArrowRight, ArrowUpRight, MessageSquare, Box, BookOpen } from "lucide-react";
 import { useRef, useState, useEffect } from "react";
+import { opsBgVideo } from "@/assets";
 
 export function FeatureGrid() {
   const items = [
@@ -13,7 +14,20 @@ export function FeatureGrid() {
     { icon: Boxes, title: "Modular SDK", body: "TypeScript, Python, and Unreal / Unity bridges. Build anywhere.", to: "/docs", stat: { value: 42, suffix: "+", label: "integrations" } },
   ];
   return (
-    <section className="relative mx-auto max-w-7xl px-6 py-32">
+    <section className="relative py-32 overflow-hidden">
+      {/* ambient looping cinematic video — integrated, not a card */}
+      <div className="absolute inset-0 -z-10">
+        <video
+          className="absolute inset-0 h-full w-full object-cover opacity-[0.22]"
+          autoPlay muted loop playsInline preload="metadata"
+          style={{ filter: "saturate(1.1) contrast(1.05)" }}
+        >
+          <source src={opsBgVideo} type="video/mp4" />
+        </video>
+        <div className="absolute inset-0 bg-gradient-to-b from-background via-background/60 to-background" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_30%,var(--background)_85%)]" />
+      </div>
+      <div className="relative mx-auto max-w-7xl px-6">
       <SectionHead eyebrow="Platform" title={<>One operating system. <span className="text-muted-foreground">Every operation.</span></>} />
       <div className="mt-14 grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
         {items.map((it, i) => (
@@ -30,6 +44,7 @@ export function FeatureGrid() {
         <Link to="/docs" className="inline-flex items-center gap-2 rounded-full glass px-5 py-2.5 text-sm font-medium hover:bg-foreground/10 transition-colors">
           <BookOpen className="h-3.5 w-3.5" /> Learn More
         </Link>
+      </div>
       </div>
     </section>
   );

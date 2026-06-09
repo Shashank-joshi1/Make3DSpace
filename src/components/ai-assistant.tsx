@@ -6,16 +6,9 @@ type Msg = { role: "user" | "assistant"; content: string };
 
 const QUICK = [
   "Turn my office floor plan into a 3D twin",
-  "Show energy usage for the campus model",
-  "How accurate is image-to-3D reconstruction?",
-  "Best practices for hospital digital twins",
-];
-
-const REPLIES = [
-  "Got it — I'll spin up a fresh twin from your floor plan. Upload a PDF, PNG, or short walkthrough video in the Builder and I'll handle scale, lighting, and asset detection automatically.",
-  "On most spaces under 50k sqft, expect a structured twin in under 4 minutes. I align point clouds, infer materials, and rebuild geometry so the result is editable, not a static mesh.",
-  "I can stream live occupancy and energy telemetry into the twin. Connect any source — BMS, Modbus, or our REST API — and I'll render it as glowing overlays in real time.",
-  "For hospitals I recommend zoning by department first, then layering staff flow and equipment telemetry on top. It keeps the twin readable as you scale to multiple buildings.",
+  "Best capture method for a 50k sqft hospital?",
+  "How does the point-cloud → mesh pipeline work?",
+  "Export a twin as GLB for Blender",
 ];
 
 export function AIAssistant() {
@@ -31,17 +24,70 @@ export function AIAssistant() {
     endRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, typing]);
 
-  const send = (text: string) => {
+  const send = async (text: string) => {
     const t = text.trim();
-    if (!t) return;
-    setMessages((m) => [...m, { role: "user", content: t }]);
+    if (!t || typing) return;
+    const next: Msg[] = [...messages, { role: "user", content: t }];
+    setMessages(next);
     setInput("");
     setTyping(true);
-    const reply = REPLIES[Math.floor(Math.random() * REPLIES.length)];
-    setTimeout(() => {
+    // Add placeholder assistant message we'll stream into
+    setMessages((m) => [...m, { role: "assistant", content: "" }]);
+
+    try {
+      const res = await fetch("/api/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          messages: next.map(({ role, content }) => ({ role, content })),
+        }),
+      });
+      if (!res.ok || !res.body) throw new Error(`HTTP ${res.status}`);
+
+      const reader = res.body.pipeThrough(new TextDecoderStream()).getReader();
+      let buffer = "";
+      let acc = "";
+      while (true) {
+        const { value, done } = await reader.read();
+        if (done) break;
+        buffer += value;
+        const lines = buffer.split("\n");
+        buffer = lines.pop() ?? "";
+        for (const line of lines) {
+          const l = line.trim();
+          if (!l.startsWith("data:")) continue;
+          const data = l.slice(5).trim();
+          if (!data || data === "[DONE]") continue;
+          try {
+            const json = JSON.parse(data);
+            const delta = json.choices?.[0]?.delta?.content ?? "";
+            if (delta) {
+              acc += delta;
+              setMessages((m) => {
+                const copy = [...m];
+                copy[copy.length - 1] = { role: "assistant", content: acc };
+                return copy;
+              });
+            }
+          } catch { /* ignore malformed chunk */ }
+        }
+      }
+      if (!acc) {
+        setMessages((m) => {
+          const copy = [...m];
+          copy[copy.length - 1] = { role: "assistant", content: "I couldn't generate a response just now. Please try again." };
+          return copy;
+        });
+      }
+    } catch (err) {
+      setMessages((m) => {
+        const copy = [...m];
+        copy[copy.length - 1] = { role: "assistant", content: "Connection error — please retry in a moment." };
+        return copy;
+      });
+    } finally {
       setTyping(false);
-      setMessages((m) => [...m, { role: "assistant", content: reply }]);
-    }, 900 + Math.random() * 600);
+    }
   };
 
   return (
@@ -95,7 +141,7 @@ export function AIAssistant() {
                   </div>
                 </motion.div>
               ))}
-              {typing && (
+              {typing && messages[messages.length - 1]?.content === "" && (
                 <div className="flex gap-1 px-3 py-2 w-max bg-foreground/5 rounded-2xl">
                   {[0, 1, 2].map((i) => (
                     <span key={i} className="h-1.5 w-1.5 rounded-full bg-foreground/60 animate-bounce" style={{ animationDelay: `${i * 120}ms` }} />

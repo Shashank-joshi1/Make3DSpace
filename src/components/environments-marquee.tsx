@@ -3,6 +3,7 @@ import { useState } from "react";
 import { ArrowUpRight, X, Activity, Building2, Box } from "lucide-react";
 import {
   envSmartCity, envCampus, envHospital, envMall, envLogistics, envStadium, envHome, envIndustrial, envRetail,
+  envAirport, envHotel, envFactory, envWarehouse,
 } from "@/assets";
 
 type Env = {
@@ -24,9 +25,16 @@ const ENVS: Env[] = [
   { id: "smart-home", title: "Smart Home", category: "Residential", image: envHome, copy: "A photoreal twin of the home — automate, design, and operate it from one place.", stats: [{ label: "Rooms", value: "12" }, { label: "Devices", value: "84" }, { label: "Scenes", value: "26" }] },
   { id: "industrial", title: "Industrial Plant", category: "Manufacturing", image: envIndustrial, copy: "Process digital twin with OT data streaming directly into the geometry.", stats: [{ label: "Lines", value: "9" }, { label: "OEE", value: "87%" }, { label: "Sensors", value: "21K" }] },
   { id: "retail", title: "Retail", category: "Commerce", image: envRetail, copy: "Flagship layout planning, planogram fidelity, and live store telemetry.", stats: [{ label: "Stores", value: "118" }, { label: "Conv.", value: "+9.4%" }, { label: "AOV", value: "$184" }] },
+  { id: "airport", title: "Airport", category: "Aviation", image: envAirport, copy: "Terminal flow, gate scheduling, and ground-ops simulation in a live twin.", stats: [{ label: "Gates", value: "82" }, { label: "Pax/yr", value: "48M" }, { label: "Turn", value: "27m" }] },
+  { id: "hotel", title: "Hotel", category: "Hospitality", image: envHotel, copy: "Guest journey, housekeeping routing, and energy zoning across every floor.", stats: [{ label: "Keys", value: "540" }, { label: "ADR", value: "$312" }, { label: "Occ.", value: "91%" }] },
+  { id: "factory", title: "Factory", category: "Manufacturing", image: envFactory, copy: "Line balancing, robot programming, and digital commissioning before metal moves.", stats: [{ label: "Robots", value: "126" }, { label: "Takt", value: "58s" }, { label: "FPY", value: "98.4%" }] },
+  { id: "warehouse", title: "Warehouse", category: "Logistics", image: envWarehouse, copy: "Slotting, AGV traffic, and put-away simulation calibrated to your DC.", stats: [{ label: "Aisles", value: "94" }, { label: "Pallets", value: "62K" }, { label: "AGV", value: "180" }] },
 ];
 
-const TRACK = [...ENVS, ...ENVS];
+const ROW_A = ENVS.slice(0, Math.ceil(ENVS.length / 2));
+const ROW_B = ENVS.slice(Math.ceil(ENVS.length / 2));
+const TRACK_A = [...ROW_A, ...ROW_A];
+const TRACK_B = [...ROW_B, ...ROW_B];
 
 export function EnvironmentsMarquee() {
   const [paused, setPaused] = useState(false);
@@ -47,43 +55,14 @@ export function EnvironmentsMarquee() {
       </div>
 
       <div
-        className="relative mt-14"
+        className="relative mt-14 space-y-6"
         onMouseEnter={() => setPaused(true)}
         onMouseLeave={() => setPaused(false)}
       >
-        {/* edge fades */}
         <div className="pointer-events-none absolute inset-y-0 left-0 w-32 bg-gradient-to-r from-background to-transparent z-10" />
         <div className="pointer-events-none absolute inset-y-0 right-0 w-32 bg-gradient-to-l from-background to-transparent z-10" />
-
-        <div
-          className="flex gap-6 will-change-transform"
-          style={{
-            animation: `marquee 60s linear infinite`,
-            animationPlayState: paused ? "paused" : "running",
-            width: "max-content",
-          }}
-        >
-          {TRACK.map((env, i) => (
-            <button
-              key={`${env.id}-${i}`}
-              onClick={() => setOpen(env)}
-              className="group relative w-[420px] sm:w-[520px] h-[340px] sm:h-[400px] rounded-3xl overflow-hidden text-left transition-transform duration-500 hover:scale-[1.02] focus:outline-none focus-visible:ring-2 focus-visible:ring-accent-glow"
-            >
-              <img src={env.image} alt={env.title} className="absolute inset-0 h-full w-full object-cover transition-transform duration-[1200ms] group-hover:scale-110" loading="lazy" />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/15 to-transparent" />
-              <div className="absolute top-4 left-4 right-4 flex items-start justify-between">
-                <span className="text-[10px] uppercase tracking-[0.25em] text-white/80 glass px-2.5 py-1 rounded-full">{env.category}</span>
-                <span className="h-9 w-9 grid place-items-center rounded-full glass text-white opacity-0 group-hover:opacity-100 transition-opacity">
-                  <ArrowUpRight className="h-4 w-4" />
-                </span>
-              </div>
-              <div className="absolute bottom-5 left-5 right-5">
-                <h3 className="text-2xl sm:text-3xl font-semibold text-white tracking-tight">{env.title}</h3>
-                <p className="mt-1.5 text-sm text-white/80 line-clamp-2">{env.copy}</p>
-              </div>
-            </button>
-          ))}
-        </div>
+        <MarqueeRow envs={TRACK_A} reverse={false} paused={paused} onOpen={setOpen} duration={70} cardSize="lg" />
+        <MarqueeRow envs={TRACK_B} reverse={true} paused={paused} onOpen={setOpen} duration={85} cardSize="md" />
       </div>
 
       <style>{`
@@ -91,12 +70,53 @@ export function EnvironmentsMarquee() {
           from { transform: translateX(0); }
           to { transform: translateX(-50%); }
         }
+        @keyframes marquee-reverse {
+          from { transform: translateX(-50%); }
+          to { transform: translateX(0); }
+        }
       `}</style>
 
       <AnimatePresence>
         {open && <EnvDetail env={open} onClose={() => setOpen(null)} />}
       </AnimatePresence>
     </section>
+  );
+}
+
+function MarqueeRow({ envs, reverse, paused, onOpen, duration, cardSize }: { envs: Env[]; reverse: boolean; paused: boolean; onOpen: (e: Env) => void; duration: number; cardSize: "md" | "lg" }) {
+  const sizing = cardSize === "lg"
+    ? "w-[420px] sm:w-[520px] h-[300px] sm:h-[360px]"
+    : "w-[340px] sm:w-[420px] h-[240px] sm:h-[290px]";
+  return (
+    <div
+      className="flex gap-6 will-change-transform"
+      style={{
+        animation: `${reverse ? "marquee-reverse" : "marquee"} ${duration}s linear infinite`,
+        animationPlayState: paused ? "paused" : "running",
+        width: "max-content",
+      }}
+    >
+      {envs.map((env, i) => (
+        <button
+          key={`${env.id}-${i}`}
+          onClick={() => onOpen(env)}
+          className={`group relative ${sizing} rounded-3xl overflow-hidden text-left transition-transform duration-500 hover:scale-[1.02] focus:outline-none focus-visible:ring-2 focus-visible:ring-accent-glow`}
+        >
+          <img src={env.image} alt={env.title} className="absolute inset-0 h-full w-full object-cover transition-transform duration-[1200ms] group-hover:scale-110" loading="lazy" />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/20 to-transparent" />
+          <div className="absolute top-4 left-4 right-4 flex items-start justify-between">
+            <span className="text-[10px] uppercase tracking-[0.25em] text-white/85 bg-black/40 backdrop-blur border border-white/10 px-2.5 py-1 rounded-full">{env.category}</span>
+            <span className="h-9 w-9 grid place-items-center rounded-full bg-black/40 backdrop-blur border border-white/10 text-white opacity-0 group-hover:opacity-100 transition-opacity">
+              <ArrowUpRight className="h-4 w-4" />
+            </span>
+          </div>
+          <div className="absolute bottom-5 left-5 right-5">
+            <h3 className="text-2xl sm:text-[1.6rem] font-semibold text-white tracking-tight">{env.title}</h3>
+            <p className="mt-1.5 text-[13px] text-white/80 line-clamp-2">{env.copy}</p>
+          </div>
+        </button>
+      ))}
+    </div>
   );
 }
 

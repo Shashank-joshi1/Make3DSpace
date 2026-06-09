@@ -60,6 +60,7 @@ function BuilderPage() {
   const [progress, setProgress] = useState(0);
   const timers = useRef<number[]>([]);
   const fileInputs = useRef<Record<UploadKind, HTMLInputElement | null>>({ photo: null, video: null, plan: null, drone: null });
+  const dropInput = useRef<HTMLInputElement | null>(null);
 
   const onPick = (kind: UploadKind) => fileInputs.current[kind]?.click();
 
@@ -191,12 +192,12 @@ function BuilderPage() {
             <div className="relative flex-1 grid place-items-center overflow-hidden">
               <SceneBackdrop />
               <input
-                ref={(el) => { fileInputs.current.photo = el; }}
-                type="file" hidden accept="image/*" multiple
+                ref={dropInput}
+                type="file" hidden accept="image/*,video/*" multiple
                 onChange={(e) => addFiles("photo", e.target.files)}
               />
               <AnimatePresence mode="wait">
-                {stage === "idle" && <IdleHint key="idle" onPick={() => onPick("photo")} onDrop={onDrop} />}
+                {stage === "idle" && <IdleHint key="idle" onPick={() => dropInput.current?.click()} onDrop={onDrop} />}
                 {stage !== "idle" && stage !== "ready" && (
                   <ProcessingView key="proc" stage={stage} progress={progress} seed={seed} category={category} />
                 )}

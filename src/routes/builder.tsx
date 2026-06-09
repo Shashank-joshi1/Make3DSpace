@@ -60,12 +60,25 @@ function BuilderPage() {
   const [progress, setProgress] = useState(0);
   const timers = useRef<number[]>([]);
   const fileInputs = useRef<Record<UploadKind, HTMLInputElement | null>>({ photo: null, video: null, plan: null, drone: null });
+  const dropInput = useRef<HTMLInputElement | null>(null);
 
   const onPick = (kind: UploadKind) => fileInputs.current[kind]?.click();
 
   const addFiles = (kind: UploadKind, list: FileList | null) => {
     if (!list) return;
     const next = Array.from(list).map((f) => ({ kind, name: f.name, size: f.size }));
+    setFiles((prev) => [...prev, ...next]);
+  };
+
+  const onDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    const list = e.dataTransfer.files;
+    if (!list || !list.length) return;
+    const next = Array.from(list).map((f) => ({
+      kind: (f.type.startsWith("video/") ? "video" : "photo") as UploadKind,
+      name: f.name,
+      size: f.size,
+    }));
     setFiles((prev) => [...prev, ...next]);
   };
 
@@ -178,8 +191,13 @@ function BuilderPage() {
 
             <div className="relative flex-1 grid place-items-center overflow-hidden">
               <SceneBackdrop />
+              <input
+                ref={dropInput}
+                type="file" hidden accept="image/*,video/*" multiple
+                onChange={(e) => addFiles("photo", e.target.files)}
+              />
               <AnimatePresence mode="wait">
-                {stage === "idle" && <IdleHint key="idle" />}
+                {stage === "idle" && <IdleHint key="idle" onPick={() => dropInput.current?.click()} onDrop={onDrop} />}
                 {stage !== "idle" && stage !== "ready" && (
                   <ProcessingView key="proc" stage={stage} progress={progress} seed={seed} category={category} />
                 )}
@@ -216,14 +234,26 @@ function SceneBackdrop() {
   );
 }
 
-function IdleHint() {
+function IdleHint({ onPick, onDrop }: { onPick: () => void; onDrop: (e: React.DragEvent) => void }) {
+  const [over, setOver] = useState(false);
   return (
-    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="relative text-center px-8">
+    <motion.button
+      type="button"
+      onClick={onPick}
+      onDragOver={(e) => { e.preventDefault(); setOver(true); }}
+      onDragLeave={() => setOver(false)}
+      onDrop={(e) => { setOver(false); onDrop(e); }}
+      initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+      className={`relative text-center px-10 py-10 rounded-2xl border border-dashed transition-all ${
+        over ? "border-accent-glow/80 bg-foreground/[0.06] scale-[1.02]" : "border-border/70 hover:border-accent-glow/60 hover:bg-foreground/[0.03]"
+      }`}
+    >
       <div className="mx-auto h-20 w-20 rounded-2xl bg-foreground/5 border border-border grid place-items-center animate-float-slow">
-        <Upload className="h-8 w-8 text-foreground/40" />
+        <Upload className="h-8 w-8 text-foreground/60" />
       </div>
-      <p className="mt-5 text-sm text-muted-foreground max-w-sm mx-auto">Pick a category and drop media. Your twin will materialize here — different geometry for every property.</p>
-    </motion.div>
+      <p className="mt-5 text-sm text-foreground font-medium">Click to upload, or drop media here</p>
+      <p className="mt-1.5 text-xs text-muted-foreground max-w-sm mx-auto">Photos, walkthrough video, drone footage or floor plans — fused into one twin.</p>
+    </motion.button>
   );
 }
 

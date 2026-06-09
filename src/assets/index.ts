@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 
 import heroMainAsset from "./Home_final.mp4";
 import opsBgAsset from "./animation_final.mp4";
@@ -6,6 +7,18 @@ import logoAsset from "./Logo_final.png";
 export const heroMainVideo = heroMainAsset;
 export const opsBgVideo = opsBgAsset;
 export const logoUrl = logoAsset;
+=======
+import oceanAsset from "./ocean.mp4.asset.json";
+import heroMainAsset from "./hero-main.mp4.asset.json";
+import opsBgAsset from "./ops-bg.mp4.asset.json";
+import logoAsset from "./logo.png.asset.json";
+
+export const oceanVideo = oceanAsset.url;
+export const heroMainVideo = heroMainAsset.url;
+export const opsBgVideo = opsBgAsset.url;
+export const logoUrl = logoAsset.url;
+
+>>>>>>> 77b6462f5ec6fc972a1316b300d7099c1bf34ac6
 export { default as monitorOnly } from "./monitor-only.png";
 export { default as demoPoster } from "./demo-poster.jpg";
 

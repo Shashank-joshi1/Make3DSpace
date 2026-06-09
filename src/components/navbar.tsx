@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { ThemeSwitcher } from "./theme-switcher";
 import { motion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
+import { logoUrl } from "@/assets";
 
 const NAV = [
   { to: "/", label: "Home" },
@@ -30,13 +31,20 @@ export function Navbar() {
   return (
     <header className={`fixed top-0 left-0 right-0 z-40 transition-all duration-500 ${scrolled ? "py-2" : "py-4"}`}>
       <div className="mx-auto max-w-7xl px-4 sm:px-6">
-        <nav className={`flex items-center gap-2 rounded-2xl px-3 sm:px-4 py-2 transition-all duration-500 ${scrolled ? "glass shadow-lg shadow-black/5" : "bg-transparent"}`}>
-          <Link to="/" className="flex items-center gap-2 pl-1 pr-3">
-            <span className="relative h-7 w-7 grid place-items-center rounded-lg bg-gradient-to-br from-primary to-accent-glow shadow-lg shadow-primary/30">
-              <span className="absolute inset-0 rounded-lg bg-gradient-to-br from-primary to-accent-glow blur-md opacity-60 -z-10" />
-              <span className="h-2 w-2 rounded-sm bg-background/90 rotate-45" />
-            </span>
-            <span className="font-semibold tracking-tight text-foreground">
+        <nav
+          className={`flex items-center gap-2 rounded-2xl px-3 sm:px-4 py-2 transition-all duration-500 border ${
+            scrolled
+              ? "bg-black/55 backdrop-blur-2xl border-white/10 shadow-xl shadow-black/30"
+              : "bg-black/30 backdrop-blur-xl border-white/5"
+          }`}
+        >
+          <Link to="/" className="flex items-center gap-2.5 pl-1 pr-3 group">
+            <img
+              src={logoUrl}
+              alt="Make3DSpace"
+              className="h-9 w-9 object-contain drop-shadow-[0_0_12px_rgba(59,130,246,0.55)] group-hover:scale-105 transition-transform"
+            />
+            <span className="font-semibold tracking-tight text-white text-[15px] hidden sm:inline">
               Make<span className="text-gradient">3D</span>Space
             </span>
           </Link>
@@ -48,15 +56,15 @@ export function Navbar() {
                 <li key={item.to}>
                   <Link
                     to={item.to}
-                    className="relative group px-3 py-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
-                    activeProps={{ className: "text-foreground" }}
+                    className="relative group px-3 py-2 text-sm text-white/70 hover:text-white transition-colors"
+                    activeProps={{ className: "text-white" }}
                     activeOptions={{ exact: true }}
                   >
                     <span className="relative z-10">{item.label}</span>
                     {active && (
                       <motion.span
                         layoutId="nav-active"
-                        className="absolute inset-0 rounded-lg bg-foreground/5"
+                        className="absolute inset-0 rounded-lg bg-white/10 border border-white/15"
                         transition={{ type: "spring", stiffness: 400, damping: 32 }}
                       />
                     )}

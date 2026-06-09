@@ -1,7 +1,7 @@
 import { motion } from "framer-motion";
 import { ArrowRight, Play, Upload, Box } from "lucide-react";
 import { Link } from "@tanstack/react-router";
-import { oceanVideo, monitorOnly } from "@/assets";
+import { heroMainVideo, monitorOnly } from "@/assets";
 import { useEffect, useState } from "react";
 import { DemoModal } from "./demo-modal";
 
@@ -32,14 +32,16 @@ export function Hero() {
           autoPlay muted loop playsInline preload="metadata"
           style={{
             transform: `translateY(${y * 0.2}px) scale(1.06)`,
-            filter: "saturate(1.05) contrast(1.03)",
+            filter: "saturate(1.08) contrast(1.05) brightness(0.92)",
           }}
         >
-          <source src={oceanVideo} type="video/mp4" />
+          <source src={heroMainVideo} type="video/mp4" />
         </video>
-        {/* Editorial gradient — keeps content readable without killing the footage */}
-        <div className="absolute inset-0 bg-gradient-to-b from-background/30 via-background/10 to-background/90" />
-        <div className="absolute inset-0 bg-gradient-to-r from-background/60 via-transparent to-transparent" />
+        {/* Tame the bright beach band at the top; keep the wave line vivid */}
+        <div className="absolute inset-x-0 top-0 h-[55%] bg-gradient-to-b from-black/70 via-black/35 to-transparent" />
+        {/* Bottom fade for content readability */}
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-background/10 to-background/90" />
+        <div className="absolute inset-0 bg-gradient-to-r from-black/45 via-transparent to-transparent" />
       </div>
 
       <div className="relative mx-auto max-w-7xl px-6 pt-32 pb-20 lg:pt-40">

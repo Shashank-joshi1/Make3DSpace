@@ -31,17 +31,17 @@ export function Hero() {
           className="absolute inset-0 h-full w-full object-cover"
           autoPlay muted loop playsInline preload="metadata"
           style={{
-            transform: `translateY(${y * 0.2}px) scale(1.06)`,
-            filter: "saturate(1.08) contrast(1.05) brightness(0.92)",
+            transform: `translateY(${y * 0.18}px) scale(1.0)`,
+            filter: "saturate(1.12) contrast(1.02) brightness(1.08)",
           }}
         >
           <source src={heroMainVideo} type="video/mp4" />
         </video>
-        {/* Tame the bright beach band at the top; keep the wave line vivid */}
-        <div className="absolute inset-x-0 top-0 h-[55%] bg-gradient-to-b from-black/70 via-black/35 to-transparent" />
+        {/* Soft top vignette so text stays legible without dimming the scene */}
+        <div className="absolute inset-x-0 top-0 h-[45%] bg-gradient-to-b from-black/45 via-black/15 to-transparent" />
         {/* Bottom fade for content readability */}
-        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-background/10 to-background/90" />
-        <div className="absolute inset-0 bg-gradient-to-r from-black/45 via-transparent to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-background/5 to-background/85" />
+        <div className="absolute inset-0 bg-gradient-to-r from-black/30 via-transparent to-transparent" />
       </div>
 
       <div className="relative mx-auto max-w-7xl px-6 pt-32 pb-20 lg:pt-40">

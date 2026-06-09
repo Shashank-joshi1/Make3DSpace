@@ -18,14 +18,14 @@ export function FeatureGrid() {
       {/* ambient looping cinematic video — integrated, not a card */}
       <div className="absolute inset-0 -z-10">
         <video
-          className="absolute inset-0 h-full w-full object-cover opacity-[0.22]"
+          className="absolute inset-0 h-full w-full object-cover opacity-[0.55]"
           autoPlay muted loop playsInline preload="metadata"
-          style={{ filter: "saturate(1.1) contrast(1.05)" }}
+          style={{ filter: "saturate(1.15) contrast(1.05) brightness(1.05)" }}
         >
           <source src={opsBgVideo} type="video/mp4" />
         </video>
-        <div className="absolute inset-0 bg-gradient-to-b from-background via-background/60 to-background" />
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_30%,var(--background)_85%)]" />
+        <div className="absolute inset-0 bg-gradient-to-b from-background/85 via-background/35 to-background/85" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_45%,var(--background)_95%)]" />
       </div>
       <div className="relative mx-auto max-w-7xl px-6">
       <SectionHead eyebrow="Platform" title={<>One operating system. <span className="text-muted-foreground">Every operation.</span></>} />

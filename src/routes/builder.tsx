@@ -58,17 +58,40 @@ function BuilderPage() {
   const [files, setFiles] = useState<Uploaded[]>([]);
   const [stage, setStage] = useState<Stage>("idle");
   const [progress, setProgress] = useState(0);
+  const [uploadedFilename, setUploadedFilename] = useState("");
+  const [analysis, setAnalysis] = useState("");
+  const [aiScene, setAiScene] = useState<any>(null);
   const timers = useRef<number[]>([]);
   const fileInputs = useRef<Record<UploadKind, HTMLInputElement | null>>({ photo: null, video: null, plan: null, drone: null });
   const dropInput = useRef<HTMLInputElement | null>(null);
 
   const onPick = (kind: UploadKind) => fileInputs.current[kind]?.click();
+  const uploadToBackend = async (file: File) => {
+  const formData = new FormData();
 
-  const addFiles = (kind: UploadKind, list: FileList | null) => {
+  formData.append("image", file);
+
+  const response = await fetch(
+    "http://localhost:5000/api/upload",
+    {
+      method: "POST",
+      body: formData,
+    }
+  );
+
+  return response.json();
+};
+
+  function addFiles(kind: UploadKind, list: FileList | null) {
     if (!list) return;
+  uploadToBackend(list[0]).then((data) => {
+  console.log("UPLOAD RESPONSE:", data);
+
+  setUploadedFilename(data.filename);
+});
     const next = Array.from(list).map((f) => ({ kind, name: f.name, size: f.size }));
     setFiles((prev) => [...prev, ...next]);
-  };
+  }
 
   const onDrop = (e: React.DragEvent) => {
     e.preventDefault();
@@ -88,17 +111,56 @@ function BuilderPage() {
     setFiles([]); setStage("idle"); setProgress(0);
   };
 
-  const start = () => {
-    if (files.length === 0) return;
-    setStage("ingesting"); setProgress(0);
-    const steps: Stage[] = ["fusing", "reconstructing", "texturing", "ready"];
-    const t0 = window.setInterval(() => setProgress((p) => Math.min(99, p + Math.random() * 4 + 1)), 80);
-    timers.current.push(t0);
-    steps.forEach((s, i) => {
-      const id = window.setTimeout(() => { setStage(s); if (s === "ready") { window.clearInterval(t0); setProgress(100); } }, 1400 * (i + 1));
-      timers.current.push(id);
-    });
-  };
+  const start = async () => {
+  if (!uploadedFilename) {
+    alert("Please upload an image first");
+    return;
+  }
+
+  try {
+    setStage("ingesting");
+    setProgress(10);
+
+    const response = await fetch(
+      "http://localhost:5000/api/generate",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          filename: uploadedFilename,
+          category,
+        }),
+      }
+    );
+console.log("STATUS:", response.status);
+
+const text = await response.text();
+console.log("RAW RESPONSE:", text);
+
+const data = JSON.parse(text);
+    
+
+    console.log("AI SCENE:", data);
+    if (data.ai) {
+  const aiScene = JSON.parse(data.ai);
+  setAiScene(aiScene);
+
+  console.log("OBJECT:", aiScene.objectType);
+  console.log("ENVIRONMENT:", aiScene.environmentType);
+
+  console.log(aiScene);
+}
+
+    setProgress(100);
+    setStage("ready");
+
+  } catch (error) {
+    console.error(error);
+    alert("Generation failed");
+  }
+};
 
   useEffect(() => () => timers.current.forEach((t) => window.clearTimeout(t)), []);
 
@@ -202,7 +264,7 @@ function BuilderPage() {
                   <ProcessingView key="proc" stage={stage} progress={progress} seed={seed} category={category} />
                 )}
                 {stage === "ready" && (
-                  <ReadyView key="ready" seed={seed} category={category} files={files} />
+                  <ReadyView key="ready" seed={seed} category={category} files={files} aiScene={aiScene} />
                 )}
               </AnimatePresence>
             </div>
@@ -283,11 +345,28 @@ function ProcessingView({ stage, progress, seed, category }: { stage: Stage; pro
   );
 }
 
-function ReadyView({ seed, category, files }: { seed: number; category: CatId; files: Uploaded[] }) {
+function ReadyView({
+  seed,
+  category,
+  files,
+  aiScene
+}: {
+  seed: number;
+  category: CatId;
+  files: Uploaded[];
+  aiScene: any;
+}) {
+  console.log("READY VIEW AI SCENE:", aiScene);
   const [autoRotate, setAutoRotate] = useState(true);
   return (
     <motion.div initial={{ opacity: 0, scale: 0.96 }} animate={{ opacity: 1, scale: 1 }} className="relative w-full h-full px-6 py-5 flex flex-col">
-      <Scene3D seed={seed} category={category} interactive autoRotate={autoRotate} />
+     <Scene3D
+  seed={seed}
+  category={category}
+  aiScene={aiScene}
+  interactive
+  autoRotate={autoRotate}
+/>
       <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
         <div className="flex items-center gap-2 text-xs text-muted-foreground">
           <CheckCircle2 className="h-3.5 w-3.5 text-emerald-500" />
@@ -326,10 +405,36 @@ function DownloadBtn({ label, filename, icon }: { label: string; filename: strin
 
 /* ------------------ Procedural 3D scene (drag-to-orbit, varies per category & seed) ------------------ */
 
-function Scene3D({ seed, category, pulse, interactive, autoRotate = false }: {
-  seed: number; category: CatId; pulse?: boolean; interactive?: boolean; autoRotate?: boolean;
+function Scene3D({
+  seed,
+  category,
+  aiScene,
+  pulse,
+  interactive,
+  autoRotate = false,
+}: {
+  seed: number;
+  category: CatId;
+  aiScene?: any;
+  pulse?: boolean;
+  interactive?: boolean;
+  autoRotate?: boolean;
 }) {
-  const blocks = useMemo(() => buildBlocks(seed, category), [seed, category]);
+  console.log("SCENE3D AI:", aiScene);
+  const blocks = useMemo(() => {
+  if (aiScene?.blocks?.length) {
+    return aiScene.blocks.map((b: any, i: number) => ({
+      x: b.x ?? i * 40,
+      z: b.z ?? 0,
+      w: b.w ?? 80,
+      d: b.d ?? 80,
+      h: b.h ?? 120,
+      hue: 160 + i * 15,
+    }));
+  }
+
+  return buildBlocks(seed, category);
+}, [aiScene, seed, category]);
   const [yaw, setYaw] = useState(-28);
   const [pitch, setPitch] = useState(-22);
   const [zoom, setZoom] = useState(1);
